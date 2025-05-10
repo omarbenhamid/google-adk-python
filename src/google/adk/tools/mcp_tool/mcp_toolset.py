@@ -17,7 +17,8 @@ import sys
 from types import TracebackType
 from typing import List, Optional, TextIO, Tuple, Type
 
-from .mcp_session_manager import MCPSessionManager, SseServerParams, retry_on_closed_resource
+from .mcp_session_manager import (MCPSessionManager, SseServerParams, StreamableHTTPServerParams,
+                                  retry_on_closed_resource)
 
 # Attempt to import MCP Tool from the MCP library, and hints user to upgrade
 # their Python version to 3.10 if it fails.
@@ -96,7 +97,7 @@ class MCPToolset:
 
   Attributes:
     connection_params: The connection parameters to the MCP server. Can be
-      either `StdioServerParameters` or `SseServerParams`.
+    `StdioServerParameters`, `SseServerParams` or `StreamableHTTPServerParams`.
     exit_stack: The async exit stack to manage the connection to the MCP server.
     session: The MCP session being initialized with the connection.
   """
@@ -104,7 +105,7 @@ class MCPToolset:
   def __init__(
       self,
       *,
-      connection_params: StdioServerParameters | SseServerParams,
+      connection_params: StdioServerParameters | SseServerParams | StreamableHTTPServerParams,
       errlog: TextIO = sys.stderr,
       exit_stack=AsyncExitStack(),
   ):
@@ -166,7 +167,8 @@ class MCPToolset:
     Args:
       connection_params: The connection parameters to the MCP server. Can be:
         `StdioServerParameters` for using local mcp server (e.g. using `npx` or
-        `python3`); or `SseServerParams` for a local/remote SSE server.
+        `python3`);  `SseServerParams` for a local/remote SSE server; or
+        `StreamableHTTPServerParams` for local/remote Streamable http server.
     """
     if not connection_params:
       raise ValueError('Missing connection params in MCPToolset.')
@@ -184,7 +186,7 @@ class MCPToolset:
   async def from_server(
       cls,
       *,
-      connection_params: StdioServerParameters | SseServerParams,
+      connection_params: StdioServerParameters | SseServerParams | StreamableHTTPServerParams,
       async_exit_stack: Optional[AsyncExitStack] = None,
       errlog: TextIO = sys.stderr,
   ) -> Tuple[List[MCPTool], AsyncExitStack]:
