@@ -193,6 +193,8 @@ class MCPSessionManager:
         )
 
       transports = await self._exit_stack.enter_async_context(client)
+      # The streamable http client returns a GetSessionCallback in addition to the read/write MemoryObjectStreams
+      # needed to build the ClientSession, we limit then to the two first values to be compatible with all clients.
       session = await self._exit_stack.enter_async_context(
           ClientSession(*transports[:2])
       )
