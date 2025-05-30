@@ -14,13 +14,14 @@
 
 
 from contextlib import AsyncExitStack
+from datetime import timedelta
 import functools
 import logging
 import sys
-from datetime import timedelta
 from typing import Any
 from typing import Optional
 from typing import TextIO
+
 import anyio
 from pydantic import BaseModel
 
@@ -63,6 +64,7 @@ class StreamableHTTPServerParams(BaseModel):
   See MCP SSE Client documentation for more details.
   https://github.com/modelcontextprotocol/python-sdk/blob/main/src/mcp/client/streamable_http.py
   """
+
   url: str
   headers: dict[str, Any] | None = None
   timeout: float = 5
@@ -137,7 +139,9 @@ class MCPSessionManager:
 
   def __init__(
       self,
-      connection_params: StdioServerParameters | SseServerParams | StreamableHTTPServerParams,
+      connection_params: (
+          StdioServerParameters | SseServerParams | StreamableHTTPServerParams
+      ),
       errlog: TextIO = sys.stderr,
   ):
     """Initializes the MCP session manager.
@@ -182,7 +186,9 @@ class MCPSessionManager:
             url=self._connection_params.url,
             headers=self._connection_params.headers,
             timeout=timedelta(seconds=self._connection_params.timeout),
-            sse_read_timeout=timedelta(seconds=self._connection_params.sse_read_timeout),
+            sse_read_timeout=timedelta(
+                seconds=self._connection_params.sse_read_timeout
+            ),
             terminate_on_close=self._connection_params.terminate_on_close,
         )
       else:
